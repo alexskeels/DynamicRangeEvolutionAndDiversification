@@ -1,3 +1,9 @@
+### This version forked by Dan Rosauer to modify and prototype an alternative macroevolutionary simulation
+
+Don't expect this code to work properly for some time
+-----------------------------------------------------
+
+
 DynamicRangeEvolutionAndDiversification (DREaD)
 ===============================================
 
