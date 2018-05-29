@@ -354,6 +354,7 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
     
   # species.rasters.2 are extant species rasters (extinct rasters are empty)
   species.rasters.2 <- species.rasters[terminal.branches[!terminal.branches %in% extinct.species]]
+  species.rasters.2 <- stack(species.rasters.2)
   # Build phylogeny
   phy.table <- buildPhyInSim(edgetable, species.rasters.2@layers, extinct, tips)
   
@@ -362,15 +363,14 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
     cols <- sample(rainbow(100,end=1, start=0, alpha=0.6 ), 100, replace = TRUE)
     par(mfrow = c(2, 1), mar=c(2,2,2,2))
     plot(env)
-    for (i in 1:length(species.rasters.2)) {
+    for (i in 1:length(species.rasters.2@layers)) {
       par(new=T)
       sp<-rasterToPolygons(species.rasters.2[[i]], dissolve=T)
       plot(sp, add=T, col=cols[i])
     }
     plot(phy.table[[2]]); axisPhylo()
   }
-  
-  species.rasters.2 <- stack(species.rasters.2)
+
   # record proportion of domain occupied by the whole clade
   clade.area <- sum(stackApply(species.rasters.2, indices = rep(1, length(species.rasters.2@layers)), fun=mean)@data@values, na.rm=T)
   #generate summary statistics (must have ENMTools loaded)
