@@ -28,12 +28,13 @@ speciateDispersal <- function(position, breadth, species.raster, env, phylo.sig,
   new.space[ras] <- NA
   # get distance from range centroid to unoccupied cells
   distance.ras <- distanceFromPoints(new.space, c(x,y))
-  # condition that if species occupies full domain to sample any cell within domain
-  if(all(distance.ras@data@values==0)){
-    dispersal.cell <- sample(seq(from=1, to=10000), 1)
-  } else{
-    # make current species range NA in distance raster
-    distance.ras <- mask(distance.ras, new.space)
+  # make current species range NA in distance raster
+  distance.ras <- mask(distance.ras, new.space)
+  # condition that if species occupies full domain can't undergo dispersal speciation so breaks loop
+  if(all(is.na(distance.ras@data@values))){
+    result <- "no_speciation"
+    return(result)
+  } else {
     # turn distances into probabilities (close cells have a greater probability of dispersal as cells further away)
     distance.probability <- as.numeric(na.omit(1 - ((distance.ras@data@values/distance.ras@data@max) + abs(new.space@data@values/max(abs(new.space@data@values), na.rm=T))/2))+0.001)
     distance.probability[which(distance.probability < 0)] <- 0

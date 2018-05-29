@@ -145,7 +145,7 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
   ############################# 4. Dispersal ###########################
       
       # disperse species' range  
-      current.species <- disperseRange(position, breadth, current.species,env, starting.env, dispersal)
+      current.species <- rangeDispersal(position, breadth, current.species, env, dispersal)
 
       # species can become extinct if no habitat within dispersal range (driven extinct by environmental change)
       # if goes extinct record the extinction and move onto next iteration
@@ -299,15 +299,18 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
           position <- as.numeric(edgetable[i,7])
           breadth <- as.numeric(edgetable[i,8])
           dispersal.speciation <- speciateDispersal(position, breadth, species.rasters[[i]], env, phylo.sig, dispersal)
-          species.rasters <- replace(species.rasters, next.free.edgetable, species.rasters[[i]])
-          species.rasters <- replace(species.rasters, next.free.edgetable+1, dispersal.speciation$species.rasters[[1]])
-          newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
-                      sum(species.rasters[[i]]@data@values, na.rm=T), time, position, 
-                      breadth, "dispersal", "X")
-          newbr2 <- c(edgetable[i, 2], next.free.edgetable +1, stepsize, NA,  
-                      sum(dispersal.speciation$species.rasters[[1]]@data@values, na.rm=T), time, dispersal.speciation$pos[[1]], 
-                      dispersal.speciation$breadth[[1]], "dispersal", "X")
-          edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2) 
+          if(dispersal.speciation == "no_speciation") { event<-5
+          } else {
+            species.rasters <- replace(species.rasters, next.free.edgetable, species.rasters[[i]])
+            species.rasters <- replace(species.rasters, next.free.edgetable+1, dispersal.speciation$species.rasters[[1]])
+            newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
+                        sum(species.rasters[[i]]@data@values, na.rm=T), time, position, 
+                        breadth, "dispersal", "X")
+            newbr2 <- c(edgetable[i, 2], next.free.edgetable +1, stepsize, NA,  
+                        sum(dispersal.speciation$species.rasters[[1]]@data@values, na.rm=T), time, dispersal.speciation$pos[[1]], 
+                        dispersal.speciation$breadth[[1]], "dispersal", "X")
+            edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)   
+          }
         }
         # No-Event (niche evolution)
         if(event == 5) {
@@ -370,7 +373,7 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
     }
     plot(phy.table[[2]]); axisPhylo()
   }
-
+  
   # record proportion of domain occupied by the whole clade
   clade.area <- sum(stackApply(species.rasters.2, indices = rep(1, length(species.rasters.2@layers)), fun=mean)@data@values, na.rm=T)
   #generate summary statistics (must have ENMTools loaded)
