@@ -3,7 +3,7 @@
 ######### rescaleEnviron #########
 # Function rescales the environmental layer between a new range allowing for consistency across simulated environments
 rescaleEnviro <- function(env,  new.min = 0, new.max = 1) {
-  new.min + (env - env.min) * ((new.max - new.min) / (env.max - env.min))
+  new.min + (env - new.min) * ((new.max - new.min) / (new.max - new.min))
 }
 ######### replaceNonNAValues #########
 # function replaces values in raster (x) that are not NA with new values (tr)
