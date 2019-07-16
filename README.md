@@ -3,6 +3,8 @@ DynamicRangeEvolutionAndDiversification (DREaD)
 
 ### Alexander Skeels & Marcel Cardillo
 
+#### Skeels, A. & Cardillo, M. 2019. Reconstructing the geography of speciation from contemporary biodiversity data. 193:2, 240-255.
+
 Load scripts and packages
 -------------------------
 
