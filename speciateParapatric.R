@@ -18,7 +18,7 @@ speciateParapatric <- function(position, breadth, species.raster, env, phylo.sig
   cells <- Which(!is.na(species.raster), cells=TRUE)
   dispersal.range.cells <- cells
   for ( i in 1:dispersal) {
-    dispersal.range.cells <- adj(species.raster, unique(dispersal.range.cells), directions=8, pairs=F)
+    dispersal.range.cells <- adjacent(species.raster, unique(dispersal.range.cells), directions=8, pairs=F)
   }
   # select cell within dispersal kernal of species
   new.range.ras <- species.raster
