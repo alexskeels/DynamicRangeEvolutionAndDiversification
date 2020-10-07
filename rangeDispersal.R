@@ -9,7 +9,7 @@
 # breadth = niche breadth of species
 # species.ras is the current species range in raster format (presence/absence)
 
-disperseRange <- function (position, breadth, species.ras, env, dispersal.range){
+rangeDispersal <- function (position, breadth, species.ras, env, dispersal.range){
   # niche bounds
   upper <- position + breadth
   lower <- position - breadth
