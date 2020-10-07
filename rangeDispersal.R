@@ -19,7 +19,7 @@ rangeDispersal <- function (position, breadth, species.ras, env, dispersal.range
   # this produces a vector of all cells that fall within the species dispersal kernal
   dispersal.range.cells <- cells
   for (i in 1:dispersal.range) {
-    dispersal.range.cells <- unique(adj(env, dispersal.range.cells, directions=8, pairs=F, include=T, numCol=100, numCell=10000))
+    dispersal.range.cells <- unique(adjacent(env, dispersal.range.cells, directions=8, pairs=F, include=T, numCol=100, numCell=10000))
   }
   # find the environmental conditions of the new cells
   env.dat <- env[dispersal.range.cells]
