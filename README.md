@@ -8,6 +8,8 @@ DynamicRangeEvolutionAndDiversification (DREaD)
 Load scripts and packages
 -------------------------
 
+Note: if working in R version 4, some users have reported bugs.... I'll work on a fix for these issues soon hopefully :)
+
 ``` r
 # set to directory containing source scripts
 setwd()
@@ -18,8 +20,8 @@ scripts <- c("rangeDispersal.R", "nicheEvolution.R","speciateAllopatric.R","spec
 
 lapply(scripts, source)
 
-required.packages <- (c("raster","gstat", "SpaDES", "ape","phytools","geiger","phyloclim","ggplot2","gridExtra","moments",
-                        "apTreeshape","parallel", "doSNOW", "rgeos", "data.table", "fossil", "ENMTools"))
+required.packages <- (c("raster","gstat", "ape","phytools","geiger","phyloclim","moments",
+                        "apTreeshape", "rgeos", "data.table", "fossil", "ENMTools"))
 
 lapply(required.packages, require, character.only=T)
 ```
