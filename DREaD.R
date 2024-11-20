@@ -360,7 +360,7 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
   
   # format edgetable for phylo stuff
   # grab the tree data
-  edgetable <- data.frame(sim1$df_og[which(!is.na(sim1$df_og[,1])),])
+  edgetable <- data.frame(edgetable[which(!is.na(edgetable[,1])),])
   colnames(edgetable) <- c("parent", "node", "branch.length", "speciated_mode", "range_size", "birthday", "niche_poistion", "niche_breadth", "speciation_formation", "extinct")
   edgetable[, 1] <- as.numeric(edgetable[, 1])
   edgetable[, 2] <- as.numeric(edgetable[, 2])
