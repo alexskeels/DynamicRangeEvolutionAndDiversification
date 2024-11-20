@@ -33,11 +33,9 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
   require(phytools)
   require(geiger)
   require(moments)
-  require(phyloclim)
   require(data.table)
-  require(fossil)
   require(apTreeshape)
-  # require(ENMTools)
+
   # extinction rate constant
   ext.rate = 0.02
   # matrix descrbing the degree of environmental change across the landscape (for enviro.hetero=T)
@@ -83,19 +81,19 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
   # column 9 is the
   # column 10 keeps track of which species are extant or extinct (extant = X, extinct="extinct")
   
-  edgetable <- matrix(ncol=10, nrow=10000)
-  edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "X")
+  edgetable <- data.frame(matrix(ncol=10, nrow=1000))
+  edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "extant")
   edgetable[1,5] <- sum(initial.species[[1]]@data@values)
   edgetable[1,7] <- initial.species[[2]]
   edgetable[1,8] <- initial.species[[3]]
   
   # species rasters is a list that hangs onto each species geographic range in the form of a raster
-  species.rasters <- vector('list', 10000)
+  species.rasters <- vector('list', 1000)
   species.rasters[[1]] <- initial.species[[1]]
   time <- 1
   stepsize <- stepsize
   tips <- 1
-  extinct <- vector("logical", 10000)
+  extinct <- vector("logical", 1000)
   extinct.number <- 0
   
   # while loop propels the simulation. iterations repeat until the condition (number of species generated) is met
@@ -109,18 +107,18 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
     # if simulation runs too long restart
     if(time >= maxtime){ 
       initial.species <- seedSpecies(env)
-      edgetable <- matrix(ncol=10, nrow=10000)
-      edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "X")
+      edgetable <- data.frame(matrix(ncol=10, nrow=1000))
+      edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "extant")
       edgetable[1,5] <- sum(initial.species[[1]]@data@values)
       edgetable[1,7] <- initial.species[[2]]
       edgetable[1,8] <- initial.species[[3]]
-      species.rasters <- vector('list', 10000)
+      species.rasters <- vector('list', 1000)
       species.rasters[[1]] <- initial.species[[1]]
       time <- 1
       stepsize <- stepsize
       tips <- 1
       extinct.number=0
-      extinct <- vector("logical", 10000)
+      extinct <- vector("logical", 1000)
     }
     
     # environment changes  
@@ -203,11 +201,11 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
             # add information on two new daughter species to the edgetable keeping track of their parent species, niche position, niche breadth, range size, and speciation mode
             newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                         sum(allopatric.speciation$species.rasters[[1]]@data@values, na.rm=T), time, allopatric.speciation$pos[[1]], 
-                        allopatric.speciation$breadth[[1]], "allopatric", "X")
+                        allopatric.speciation$breadth[[1]], "allopatric", "extant")
             
             newbr2 <- c(edgetable[i, 2], next.free.edgetable+1, stepsize, NA,  
                         sum(allopatric.speciation$species.rasters[[2]]@data@values, na.rm=T), time, allopatric.speciation$pos[[2]], 
-                        allopatric.speciation$breadth[[2]], "allopatric", "X")
+                        allopatric.speciation$breadth[[2]], "allopatric", "extant")
             edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)
           }
           # if species' range is divided in two these two range fragements will become the new daughter species
@@ -222,10 +220,10 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
             species.rasters <- replace(species.rasters, next.free.edgetable+1, recenteredsp2[[3]])
             newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                         sum(recenteredsp1[[3]]@data@values, na.rm=T), time, recenteredsp1[[1]], 
-                        recenteredsp1[[2]], "allopatric", "X")
+                        recenteredsp1[[2]], "allopatric", "extant")
             newbr2 <- c(edgetable[i, 2], next.free.edgetable+1, stepsize, NA,  
                         sum(recenteredsp2[[3]]@data@values, na.rm=T), time, recenteredsp2[[1]], 
-                        recenteredsp2[[2]], "allopatric", "X")
+                        recenteredsp2[[2]], "allopatric", "extant")
             edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)
           }
           # if the species' range is fragmented into more than two fragments  the two daughter species range are determined by a spatial clustering (k-means) algorithm
@@ -255,10 +253,10 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
             species.rasters <- replace(species.rasters, next.free.edgetable+1, recenteredsp2[[3]])
             newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                         sum(recenteredsp1[[3]]@data@values, na.rm=T), time, recenteredsp1[[1]], 
-                        recenteredsp1[[2]], "allopatric", "X")
+                        recenteredsp1[[2]], "allopatric", "extant")
             newbr2 <- c(edgetable[i, 2], next.free.edgetable+1, stepsize, NA,  
                         sum(recenteredsp2[[3]]@data@values, na.rm=T), time, recenteredsp2[[1]], 
-                        recenteredsp2[[2]], "allopatric", "X")
+                        recenteredsp2[[2]], "allopatric", "extant")
             edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)
           }
         }
@@ -270,10 +268,10 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
           species.rasters <- replace(species.rasters, next.free.edgetable+1, sympatric.speciation$species.rasters[[1]])
           newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                       sum(species.rasters[[i]]@data@values, na.rm=T), time, position, 
-                      breadth, "sympatric", "X")
+                      breadth, "sympatric", "extant")
           newbr2 <- c(edgetable[i, 2], next.free.edgetable+1, stepsize, NA,  
                       sum(sympatric.speciation$species.rasters[[1]]@data@values, na.rm=T), time, sympatric.speciation$pos[[1]], 
-                      sympatric.speciation$breadth[[1]], "sympatric", "X")
+                      sympatric.speciation$breadth[[1]], "sympatric", "extant")
           edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)
         }
         
@@ -287,10 +285,10 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
           species.rasters <- replace(species.rasters, next.free.edgetable+1,parapatric.speciation$species.rasters[[1]])
           newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                       sum(species.rasters[[i]]@data@values, na.rm=T), time, position, 
-                      breadth, "parapatric", "X")
+                      breadth, "parapatric", "extant")
           newbr2 <- c(edgetable[i, 2], next.free.edgetable + 1, stepsize, NA,  
                       sum(parapatric.speciation$species.rasters[[1]]@data@values, na.rm=T), time, parapatric.speciation$pos[[1]], 
-                      parapatric.speciation$breadth[[1]], "parapatric", "X")
+                      parapatric.speciation$breadth[[1]], "parapatric", "extant")
           edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)
         }
         # Dispersal speciation
@@ -305,10 +303,10 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
             species.rasters <- replace(species.rasters, next.free.edgetable+1, dispersal.speciation$species.rasters[[1]])
             newbr1 <- c(edgetable[i, 2], next.free.edgetable, stepsize, NA,  
                         sum(species.rasters[[i]]@data@values, na.rm=T), time, position, 
-                        breadth, "dispersal", "X")
+                        breadth, "dispersal", "extant")
             newbr2 <- c(edgetable[i, 2], next.free.edgetable +1, stepsize, NA,  
                         sum(dispersal.speciation$species.rasters[[1]]@data@values, na.rm=T), time, dispersal.speciation$pos[[1]], 
-                        dispersal.speciation$breadth[[1]], "dispersal", "X")
+                        dispersal.speciation$breadth[[1]], "dispersal", "extant")
             edgetable[c(next.free.edgetable,next.free.edgetable+1),] <- rbind(newbr1, newbr2)   
           }
         }
@@ -332,17 +330,17 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
     # if all species are extinct reset to the starting values of the simulation
       if (all(edgetable[, 10][which(!edgetable[, 2] %in% edgetable[, 1])] =="extinct")) {
         initial.species <- seedSpecies(env, dispersal=dispersal)
-        edgetable <- matrix(ncol=10, nrow=10000)
-        edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "X")
+        edgetable <- data.frame(matrix(ncol=10, nrow=1000))
+        edgetable[1,] <- c(0, 1, 0, NA, NA, 1, NA, NA, NA, "extant")
         edgetable[1,5] <- sum(initial.species[[1]]@data@values, na.rm=T)
         edgetable[1,7] <- initial.species[[2]]
         edgetable[1,8] <- breadth
-        species.rasters <- vector('list', 10000)
+        species.rasters <- vector('list', 1000)
         species.rasters[[1]] <- initial.species[[1]]
         time <- 1
         stepsize <- stepsize
         tips <- 1
-        extinct <- vector("logical", 10000)
+        extinct <- vector("logical", 1000)
         # Record mass extinction event. When 5 mass extinction events occur (extinction =5) in a row the simulation will sample new parameters and start again
         extinction <- extinction + 1
         extinct.number <- 0
@@ -358,43 +356,29 @@ DREaD <- function (totaltips, dispersal, amp, freq, slope, niche.ev.rate, breadt
   # species.rasters.2 are extant species rasters (extinct rasters are empty)
   species.rasters.2 <- species.rasters[terminal.branches[!terminal.branches %in% extinct.species]]
   species.rasters.2 <- stack(species.rasters.2)
-  # Build phylogeny
-  phy.table <- buildPhyInSim(edgetable, species.rasters.2@layers, extinct, tips)
   
-  # plot species ranges
-  if (plot == TRUE ) {
-    cols <- sample(rainbow(100,end=1, start=0, alpha=0.6 ), 100, replace = TRUE)
-    par(mfrow = c(2, 1), mar=c(2,2,2,2))
-    plot(env)
-    for (i in 1:length(species.rasters.2@layers)) {
-      par(new=T)
-      sp<-rasterToPolygons(species.rasters.2[[i]], dissolve=T)
-      plot(sp, add=T, col=cols[i])
-    }
-    plot(phy.table[[2]]); axisPhylo()
-  }
   
-  # record proportion of domain occupied by the whole clade
-  clade.area <- sum(stackApply(species.rasters.2, indices = rep(1, length(species.rasters.2@layers)), fun=mean)@data@values, na.rm=T)
+  # format edgetable for phylo stuff
+  # grab the tree data
+  edgetable <- data.frame(sim1$df_og[which(!is.na(sim1$df_og[,1])),])
+  colnames(edgetable) <- c("parent", "node", "branch.length", "speciated_mode", "range_size", "birthday", "niche_poistion", "niche_breadth", "speciation_formation", "extinct")
+  edgetable[, 1] <- as.numeric(edgetable[, 1])
+  edgetable[, 2] <- as.numeric(edgetable[, 2])
+  edgetable[, 3] <- as.numeric(edgetable[, 3])
+  tips <- as.numeric(edgetable$node[which(!edgetable$node %in% edgetable$parent)])
+  edgetable$raster_match <- NA
+  edgetable$raster_match[which(edgetable$node %in% tips)] <- c(1:length(tips))
+  
+  #Build phylogeny
+  phy.table <- buildPhyInSim2(edgetable)
+  
   #generate summary statistics (must have ENMTools loaded)
-  if(generateSummaryStatistics == TRUE) {
-    summaryStats <- try(generateSummaryStatistics(phy.table[[1]], species.rasters.2, phy.table[[2]], drop.fossil = T))
-    ARC.clade <- createENMToolsclade(species.rasters.2, phy.table[[1]], phy.table[[2]], env, drop.fossil = T)
-    ARC <- try(enmtools.aoc(clade = ARC.clade,  nreps = 0, overlap.source = "range"))
-    if(class(summaryStats) == "try-error") { 
-      summary.vector=NA
-    } else { 
-      if(class(ARC)=="try-error"){
-        summary.vector = c(summaryStats$analysis, NA, NA)
-        ARC <- NA
-      } else {
-        summary.vector = c(summaryStats$analysis, ARC$coefficients[[1,1]], ARC$coefficients[[1,2]])
-      }
-    }
-    results <- list("df" = phy.table[[1]], "phy" = phy.table[[2]], "rasters" = species.rasters.2, "env" = env, "params"=params, "ARC"=ARC, "summaryStats"=summaryStats, "summaryVector"= summary.vector , "extinct"= length(which(extinct==TRUE)), "clade.area"= clade.area)  
-  } else {
-  results <- list("df" = phy.table[[1]], "phy" = phy.table[[2]], "rasters" = species.rasters.2, "env" = env, "params"=params, "extinct"= length(which(extinct==TRUE)), "clade.area"=clade.area)  
-  }
+  results <- list("species_table" = phy.table[[1]], 
+                  "phylogeny" = phy.table[[2]], 
+                  "ranges" = species.rasters.2, 
+                  "final_environment" = env, 
+                  "model_parameters" = params)  
+  
 # returns a list with the following elements 1) data frame with species information, 2) phylogeney, 3) environment (as was at end of simulation), 4) parameters used in that simulation
 # 5) the Age-Range_correlation object crated by ENMTools, 6) a list of summary statistics (see generateSummaryStatistics function for details), 7) number of extinct lineages, 8) total area occupied by clade
   return(results)  

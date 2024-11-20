@@ -47,7 +47,7 @@ buildPhyInSim <- function (edgetable, n.layers, extinct, tips){
   rownames(edgetable) <- NULL
   colnames(edgetable) <- NULL
   tips.table <- matrix(cbind(matrix(edgetable[which(!edgetable[, 2] %in% edgetable[, 1])[!which(!edgetable[, 2] %in% edgetable[, 1]) %in% which(extinct==TRUE)],], ncol=10), c(1:length(n.layers))), ncol=11)
-  edgetable <- merge(edgetable,tips.table, all.x=T)
+  edgetable <- base::merge(edgetable,tips.table, all.x=T)
   edgetable<-as.matrix(edgetable, ncol=11)
   rownames(edgetable) <- NULL
   colnames(edgetable) <- NULL
@@ -85,6 +85,37 @@ buildPhyInSim <- function (edgetable, n.layers, extinct, tips){
   colnames(simtrtabord)<- c("parent", "daughter", "brlen", "specMode", "area", "birthDate", "nichePos", "nicheBreadth", "birthMode", "alive", "rasterMatch")
   return(list(simtrtabord, timephylo))
 }
+
+# new phylo builder
+buildPhyInSim2 <- function(edgetable){
+  edge<-as.matrix(edgetable[,c("parent", "node")])
+  ## find nodes
+  nodes<-unique(edge[,1])
+  ## find tips
+  tips<-setdiff(edge[,2],edge[,1])
+  ## substitute nodes for negative integer series
+  ## and tips for 1:N
+  snodes<--(length(tips)+1:length(nodes))[order(nodes)]
+  stips<-(1:length(tips))[order(tips)]
+  for(i in 1:length(nodes))
+    edge[which(edge==nodes[i])]<-snodes[i]
+  for(i in 1:length(tips))
+    edge[which(edge==tips[i])]<-stips[i]
+  ## set edge to absolute value
+  edge<-abs(edge)
+  ## create phylo object
+  tree <- list(edge=edge,
+               edge.length=edgetable[,"branch.length"],
+               tip.label = paste0("species_", 1:length(tips)),
+               Nnode = length(nodes))
+  ## assign class
+  class(tree) <- "phylo"
+  edgetable$phylo_parent <- edge[,1]
+  edgetable$phylo_node <- edge[,2]
+  
+  return(list("edgetable"=edgetable, "phy"=tree))
+}
+
 ######### generateEnv #########
 # simulates an environmental layer with a degree of spatial autocorreltion
 generateEnv <- function(grid.size=100, psill=0.005, range=15, rescale.max=25, rescale.min=0, plot=F, original=F) {
